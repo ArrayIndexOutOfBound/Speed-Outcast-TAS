@@ -1,0 +1,19 @@
+START
+# Some comments, all good
+ST_F
+SLEEP 125
+SP_F
+ST_L
+SLEEP 125
+SP_L
+ST_B
+SLEEP 125
+SP_B
+ST_R
+SLEEP 125
+SP_R
+ST_JUMP
+SLEEP 1250
+SP_JUMP
+# Some comments, all good
+DONE

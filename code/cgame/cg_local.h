@@ -693,6 +693,9 @@ extern	vmCvar_t		cg_strafeHelperColorSpeedG;
 extern	vmCvar_t		cg_strafeHelperColorSpeedB;
 extern	vmCvar_t		cg_strafeHelperColorSpeedA;
 
+// TAS
+extern	vmCvar_t		cg_TASActive;
+
 void CG_NewClientinfo( int clientNum );
 //
 // cg_main.c

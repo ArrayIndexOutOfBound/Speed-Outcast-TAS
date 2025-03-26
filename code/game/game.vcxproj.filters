@@ -448,6 +448,9 @@
     <ClCompile Include="..\tas\tas.cpp">
       <Filter>tas</Filter>
     </ClCompile>
+    <ClCompile Include="..\tas\tasStarter.cpp">
+      <Filter>tas</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Icarus\BlockStream.h">
@@ -685,6 +688,9 @@
       <Filter>speedrun\speedrun_timer_q3</Filter>
     </ClInclude>
     <ClInclude Include="..\tas\tas.hpp">
+      <Filter>tas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tas\tasStarter.hpp">
       <Filter>tas</Filter>
     </ClInclude>
   </ItemGroup>

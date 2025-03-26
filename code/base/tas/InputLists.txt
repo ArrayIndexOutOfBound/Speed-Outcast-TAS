@@ -1,0 +1,17 @@
+--- cl_input.cpp
+--IN_KeyUp( kbutton_t *b )
+forward = 90,0 ; ??? ; 0 ; 1 ; 1
+backward = 83
+left = 81
+right = 68
+jump = 32
+crouch = 2
+use = 69
+left click = 141
+right click = 142
+
+---cmd.cpp
+--Cmd_ExecuteString
++moveright 68 387824171
+use_bacta
+
