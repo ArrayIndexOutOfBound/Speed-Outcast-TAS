@@ -90,8 +90,8 @@ void TAS::readTasFile()
 	}
 
 	// TODO : store ALL actions in a massive string vector
-	allActionBuffer.clear(); // Clear precedent buffer from other map
-	actionBufferIndex = 0;
+	allCommandsBuffer.clear(); // Clear precedent buffer from other map
+	commandsBufferIndex = 0;
 	//allActionBuffer.push_back("Test");
 
 
@@ -110,7 +110,7 @@ void TAS::readTasFile()
 		// Remove all lines that starts with '#' as they are comments
 		if (!(line.front() == '#'))
 		{
-			allActionBuffer.push_back(line);
+			allCommandsBuffer.push_back(line);
 		}
 		
 	}
@@ -125,30 +125,30 @@ void TAS::readTasFile()
 	*/
 
 	// Small validations
-	if (!(allActionBuffer.front() == "START"))
+	if (!(allCommandsBuffer.front() == "START"))
 	{
 		gi.Printf("TAS : file doesn't start with START, ignoring.\n");
-		allActionBuffer.clear();
+		allCommandsBuffer.clear();
 	}
-	if (!(allActionBuffer.back() == "DONE"))
+	if (!(allCommandsBuffer.back() == "DONE"))
 	{
 		gi.Printf("TAS : file doesn't finish with DONE, ignoring.\n");
-		allActionBuffer.clear();
+		allCommandsBuffer.clear();
 	}
-	for (int i = 0; i < allActionBuffer.size(); i++)
+	for (int i = 0; i < allCommandsBuffer.size(); i++)
 	{
-		if (allActionBuffer[i] == "SLEEPS" || allActionBuffer[i] == "SLEEPF")
+		if (allCommandsBuffer[i] == "SLEEPS" || allCommandsBuffer[i] == "SLEEPF")
 		{
-			bool isNumber = !allActionBuffer[i+1].empty() && std::all_of(allActionBuffer[i+1].begin(), allActionBuffer[i+1].end(), ::isdigit);
+			bool isNumber = !allCommandsBuffer[i+1].empty() && std::all_of(allCommandsBuffer[i+1].begin(), allCommandsBuffer[i+1].end(), ::isdigit);
 			if (!isNumber)
 			{
 				gi.Printf("TAS : line after a sleep is not a number, ignoring.\n");
-				allActionBuffer.clear();
+				allCommandsBuffer.clear();
 			}
 		}
 	}
 
-	if (allActionBuffer.size() >=1) gi.Printf("TAS : script is valid, executing.\n");
+	if (allCommandsBuffer.size() >=1) gi.Printf("TAS : script is valid, executing.\n");
 	gi.FS_FreeFile(bufferFromFile);
 }
 
@@ -189,12 +189,12 @@ void TAS::makeOperationThisFrame()
 		return;
 	}
 	// Second, check the START and DONE flags
-	if (allActionBuffer[actionBufferIndex] == "START")
+	if (allCommandsBuffer[commandsBufferIndex] == "START")
 	{
 		// Go up by one, we don't care about the start flag
-		actionBufferIndex++;
+		commandsBufferIndex++;
 	}
-	if (allActionBuffer[actionBufferIndex] == "DONE")
+	if (allCommandsBuffer[commandsBufferIndex] == "DONE")
 	{
 		//gi.Printf("TAS : end of execution for map %s.\n", lastKnownMap);
 		//actionBufferIndex = 0;
@@ -207,244 +207,250 @@ void TAS::makeOperationThisFrame()
 	while (!sleepBufferHasBeenIt)
 	{
 		// Sleep
-		if (allActionBuffer[actionBufferIndex] == "SLEEPS")
+		if (allCommandsBuffer[commandsBufferIndex] == "SLEEPS")
 		{
 			// Already checked before of this string is a integer
-			sleepDuration = atoi(allActionBuffer[actionBufferIndex + 1].c_str()) * 125; // 1 sec = 125frames
-			actionBufferIndex += 2;
+			sleepDuration = atoi(allCommandsBuffer[commandsBufferIndex + 1].c_str()) * 125; // 1 sec = 125frames
+			commandsBufferIndex += 2;
 			sleepBufferHasBeenIt = true;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SLEEPF")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SLEEPF")
 		{
 			// Already checked before of this string is a integer
-			sleepDuration = atoi(allActionBuffer[actionBufferIndex + 1].c_str());
-			actionBufferIndex += 2;
+			sleepDuration = atoi(allCommandsBuffer[commandsBufferIndex + 1].c_str());
+			commandsBufferIndex += 2;
 			sleepBufferHasBeenIt = true;
 
 		}
 		// Mouvement
-		else if (allActionBuffer[actionBufferIndex] == "ST_MOVE_F")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_MOVE_F")
 		{
-			commandBuffer += "+forward;";
-			actionBufferIndex++;
+			commandsBuffer += "+forward;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_MOVE_F")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_MOVE_F")
 		{
-			commandBuffer += "-forward;";
-			actionBufferIndex++;
+			commandsBuffer += "-forward;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "ST_MOVE_B")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_MOVE_B")
 		{
-			commandBuffer += "+back;";
-			actionBufferIndex++;
+			commandsBuffer += "+back;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_MOVE_B")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_MOVE_B")
 		{
-			commandBuffer += "-back;";
-			actionBufferIndex++;
+			commandsBuffer += "-back;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "ST_MOVE_L")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_MOVE_L")
 		{
-			commandBuffer += "+moveleft;";
-			actionBufferIndex++;
+			commandsBuffer += "+moveleft;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_MOVE_L")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_MOVE_L")
 		{
-			commandBuffer += "-moveleft;";
-			actionBufferIndex++;
+			commandsBuffer += "-moveleft;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "ST_MOVE_R")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_MOVE_R")
 		{
-			commandBuffer += "+moveright;";
-			actionBufferIndex++;
+			commandsBuffer += "+moveright;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_MOVE_R")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_MOVE_R")
 		{
-			commandBuffer += "-moveright;";
-			actionBufferIndex++;
+			commandsBuffer += "-moveright;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "ST_JUMP")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_JUMP")
 		{
-			commandBuffer += "+moveup;";
-			actionBufferIndex++;
+			commandsBuffer += "+moveup;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_JUMP")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_JUMP")
 		{
-			commandBuffer += "-moveup;";
-			actionBufferIndex++;
+			commandsBuffer += "-moveup;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "ST_CROUCH")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_CROUCH")
 		{
-			commandBuffer += "+movedown;";
-			actionBufferIndex++;
+			commandsBuffer += "+movedown;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_CROUCH")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_CROUCH")
 		{
-			commandBuffer += "-movedown;";
-			actionBufferIndex++;
+			commandsBuffer += "-movedown;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "ST_USE")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_USE")
 		{
-			commandBuffer += "+use;";
-			actionBufferIndex++;
+			commandsBuffer += "+use;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_USE")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_USE")
 		{
-			commandBuffer += "-use;";
-			actionBufferIndex++;
+			commandsBuffer += "-use;";
+			commandsBufferIndex++;
 		}
 		// Mouse
-		else if (allActionBuffer[actionBufferIndex] == "ST_LC")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_LC")
 		{
-			commandBuffer += "+attack;";
-			actionBufferIndex++;
+			commandsBuffer += "+attack;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_LC")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_LC")
 		{
-			commandBuffer += "-attack;";
-			actionBufferIndex++;
+			commandsBuffer += "-attack;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "ST_RC")
+		else if (allCommandsBuffer[commandsBufferIndex] == "ST_RC")
 		{
-			commandBuffer += "+altattack;";
-			actionBufferIndex++;
+			commandsBuffer += "+altattack;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SP_RC")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SP_RC")
 		{
-			commandBuffer += "-altattack;";
-			actionBufferIndex++;
+			commandsBuffer += "-altattack;";
+			commandsBufferIndex++;
 		}
 		// Inventory
-		else if (allActionBuffer[actionBufferIndex] == "BACTA")
+		else if (allCommandsBuffer[commandsBufferIndex] == "BACTA")
 		{
-			commandBuffer += "use_bacta;";
-			actionBufferIndex++;
+			commandsBuffer += "use_bacta;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SEEKER")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SEEKER")
 		{
-			commandBuffer += "use_seeker;";
-			actionBufferIndex++;
+			commandsBuffer += "use_seeker;";
+			commandsBufferIndex++;
 		}
 		// Force powers
-		else if (allActionBuffer[actionBufferIndex] == "FP_PUSH")
+		else if (allCommandsBuffer[commandsBufferIndex] == "FP_PUSH")
 		{
-			commandBuffer += "force_push;";
-			actionBufferIndex++;
+			commandsBuffer += "force_push;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "FP_PULL")
+		else if (allCommandsBuffer[commandsBufferIndex] == "FP_PULL")
 		{
-			commandBuffer += "force_pull;";
-			actionBufferIndex++;
+			commandsBuffer += "force_pull;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "FP_SPEED")
+		else if (allCommandsBuffer[commandsBufferIndex] == "FP_SPEED")
 		{
-			commandBuffer += "force_speed;";
-			actionBufferIndex++;
+			commandsBuffer += "force_speed;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "FP_DISTRACT")
+		else if (allCommandsBuffer[commandsBufferIndex] == "FP_DISTRACT")
 		{
-			commandBuffer += "force_distract;";
-			actionBufferIndex++;
+			commandsBuffer += "force_distract;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "FP_HEAL")
+		else if (allCommandsBuffer[commandsBufferIndex] == "FP_HEAL")
 		{
-			commandBuffer += "force_heal;";
-			actionBufferIndex++;
+			commandsBuffer += "force_heal;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "FP_SABER")
+		else if (allCommandsBuffer[commandsBufferIndex] == "FP_SABER")
 		{
-			commandBuffer += "saberAttackCycle;";
-			actionBufferIndex++;
+			commandsBuffer += "saberAttackCycle;";
+			commandsBufferIndex++;
 		}
 		// Game manipulation
-		else if (allActionBuffer[actionBufferIndex] == "QUICK_SAVE")
+		else if (allCommandsBuffer[commandsBufferIndex] == "QUICK_SAVE")
 		{
-			commandBuffer += "save quik*;";
-			actionBufferIndex++;
+			commandsBuffer += "save quik*;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "QUICK_LOAD")
+		else if (allCommandsBuffer[commandsBufferIndex] == "QUICK_LOAD")
 		{
-			commandBuffer += "load quik;";
-			actionBufferIndex++;
+			commandsBuffer += "load quik;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "HARD_SAVE")
+		else if (allCommandsBuffer[commandsBufferIndex] == "HARD_SAVE")
 		{
-			commandBuffer += "save tas;";
-			actionBufferIndex++;
+			commandsBuffer += "save tas;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "HARD_LOAD")
+		else if (allCommandsBuffer[commandsBufferIndex] == "HARD_LOAD")
 		{
-			commandBuffer += "load tas;";
-			actionBufferIndex++;
+			commandsBuffer += "load tas;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "SOUNDSTOP")
+		else if (allCommandsBuffer[commandsBufferIndex] == "SOUNDSTOP")
 		{
-			commandBuffer += "soundstop;";
-			actionBufferIndex++;
+			commandsBuffer += "soundstop;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "VIDRESTART")
+		else if (allCommandsBuffer[commandsBufferIndex] == "VIDRESTART")
 		{
-			commandBuffer += "vid_restart;";
-			actionBufferIndex++;
+			commandsBuffer += "vid_restart;";
+			commandsBufferIndex++;
+		}
+		else if (allCommandsBuffer[commandsBufferIndex] == "PRINT")
+		{
+			gi.Printf("TAS : %s.\n", allCommandsBuffer[commandsBufferIndex + 1].c_str());
+			commandsBufferIndex += 2;
+
 		}
 		// Weapon
-		else if (allActionBuffer[actionBufferIndex] == "WP_SABER")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_SABER")
 		{
-			commandBuffer += "weapon 1;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 1;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_BRYAR")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_BRYAR")
 		{
-			commandBuffer += "weapon 2;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 2;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_E11")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_E11")
 		{
-			commandBuffer += "weapon 3;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 3;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_DISTRUPTOR")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_DISTRUPTOR")
 		{
-			commandBuffer += "weapon 4;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 4;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_BOWCASTER")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_BOWCASTER")
 		{
-			commandBuffer += "weapon 5;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 5;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_REPETITION")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_REPETITION")
 		{
-			commandBuffer += "weapon 6;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 6;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_DEMP")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_DEMP")
 		{
-			commandBuffer += "weapon 7;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 7;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_FLECHETTE")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_FLECHETTE")
 		{
-			commandBuffer += "weapon 8;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 8;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_MISSILE")
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_MISSILE")
 		{
-			commandBuffer += "weapon 9;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 9;";
+			commandsBufferIndex++;
 		}
-		else if (allActionBuffer[actionBufferIndex] == "WP_EXPLOSIVES") // Note : thre must be a better way to properly get desired weapons
+		else if (allCommandsBuffer[commandsBufferIndex] == "WP_EXPLOSIVES") // Note : thre must be a better way to properly get desired weapons
 		{
-			commandBuffer += "weapon 10;";
-			actionBufferIndex++;
+			commandsBuffer += "weapon 10;";
+			commandsBufferIndex++;
 		}
 
 	}
 	
 	// Four : Send the buffer during this frame
-	cgi_SendConsoleCommand(commandBuffer.c_str());
+	cgi_SendConsoleCommand(commandsBuffer.c_str());
 	sleepBufferHasBeenIt = false;
-	commandBuffer = "";
+	commandsBuffer = "";
 	return;
 }
 

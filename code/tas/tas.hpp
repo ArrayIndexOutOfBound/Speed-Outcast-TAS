@@ -35,8 +35,8 @@ private:
 	int32_t sleepDuration = 0;
 	char lastKnownMap [64] = "";
 
-	std::vector<std::string> allActionBuffer;
-	int16_t actionBufferIndex = 0;
-	std::string commandBuffer = "";
+	std::vector<std::string> allCommandsBuffer;
+	int16_t commandsBufferIndex = 0;
+	std::string commandsBuffer = "";
 
 };

@@ -2,6 +2,10 @@ START
 # First line must be START
 # Objective : doing every macro as an exemple.
 # Above is a test of movements
+PRINT
+Testing movements...
+SLEEPF
+50
 ST_MOVE_F
 SLEEPS
 1
@@ -27,6 +31,10 @@ SLEEPS
 1
 SP_CROUCH
 # Below are small mouse click tests
+PRINT
+Testing attacks...
+SLEEPF
+50
 ST_LC
 SLEEPS
 2
@@ -36,11 +44,19 @@ SLEEPS
 2
 SP_RC
 # Below are inventory tests
+PRINT
+Testing inventory...
+SLEEPF
+50
 BACTA
 SEEKER
 SLEEPS
 1
 # Below are force powers tests
+PRINT
+Testing force powers...
+SLEEPF
+50
 FP_SPEED
 SLEEPS
 1
@@ -53,10 +69,17 @@ SLEEPS
 FP_DISTRACT
 SLEEPS
 1
+FP_HEAL
+SLEEPS
+1
 FP_SABER
 SLEEPS
 1
 # Below are game save and manipulations
+PRINT
+Testing saves and loads...
+SLEEPF
+50
 QUICK_SAVE
 SLEEPS
 1
@@ -76,6 +99,10 @@ VIDRESTART
 SLEEPS
 5
 # Below are weapon switchs
+PRINT
+Testing weapons...
+SLEEPF
+50
 WP_SABER
 SLEEPS
 1
