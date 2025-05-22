@@ -1313,6 +1313,7 @@ qboolean ValidUseTarget( gentity_t *ent )
 
 	if ( ent->svFlags & SVF_INACTIVE )
 	{//set by target_deactivate
+		gi.Printf(S_COLOR_RED"%i ValidUseTarget : target is disabled !\n", level.time);
 		return qfalse;
 	}
 	
@@ -1362,6 +1363,8 @@ void TryUse( gentity_t *ent )
 	//Trace ahead to find a valid target
 	gi.trace( &trace, src, vec3_origin, vec3_origin, dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, (EG2_Collision)0, 0 );
 	
+	gi.Printf("%i TryUse : src[%f,%f,%f] , dest[%f,%f,%f]  \n", level.time, src[0], src[1], src[2], dest[0], dest[1], dest[2]);
+
 	if ( trace.fraction == 1.0f || trace.entityNum < 1 )
 	{
 		//TODO: Play a failure sound
@@ -1371,6 +1374,8 @@ void TryUse( gentity_t *ent )
 			ForceTelepathy( ent );
 		}
 		*/
+		gi.Printf("%i TryUse : -----\n", level.time);
+		gi.Printf("%i TryUse : returning early, trace.fraction = %f, trace.entityNum = %f\n", level.time, trace.fraction, trace.entityNum);
 		return;
 	}
 
@@ -1379,6 +1384,12 @@ void TryUse( gentity_t *ent )
 	//Check for a use command
 	if ( ValidUseTarget( target ) )
 	{
+		gi.Printf(S_COLOR_GREEN"%i TryUse : src[%f,%f,%f] , dest[%f,%f,%f]  \n", level.time, src[0], src[1], src[2], dest[0], dest[1], dest[2]);
+		gi.Printf(S_COLOR_GREEN"%i TryUse : trace.fraction = %f, trace.entityNum = %f\n", level.time, trace.fraction, trace.entityNum);
+		gi.Printf(S_COLOR_GREEN"%i TryUse : ValidUseTarget found !\n", level.time);
+		gi.Printf(S_COLOR_GREEN"%i TryUse : %s , %s, %s\n", level.time, target->classname, target->target, target->message);
+		gi.Printf(S_COLOR_GREEN"%i TryUse : target min&max, dest values must be inside : [%f,%f],[%f,%f],[%f,%f]\n",
+			level.time, target->absmin[0], target->absmax[0], target->absmin[1], target->absmax[1],  target->absmin[2], target->absmax[2]);
 		NPC_SetAnim( ent, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 		/*
 		if ( !VectorLengthSquared( ent->client->ps.velocity ) && !PM_CrouchAnim( ent->client->ps.legsAnim ) )
@@ -1406,6 +1417,8 @@ void TryUse( gentity_t *ent )
 		ForceTelepathy( ent );
 	}
 	*/
+	gi.Printf("%i TryUse : trace.fraction = %f, trace.entityNum = %f\n", level.time, trace.fraction, trace.entityNum);
+	gi.Printf("%i TryUse : no ValidUseTarget found.\n", level.time);
 }
 
 extern int killPlayerTimer;

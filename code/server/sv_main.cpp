@@ -541,6 +541,7 @@ void SV_Frame( int msec,float fractionMsec ) {
 		G2API_SetTime(sv.time,G2T_SV_TIME);
 
 		// let everything in the world think and move
+		// Posto
 		ge->RunFrame( sv.time );
 	}
 

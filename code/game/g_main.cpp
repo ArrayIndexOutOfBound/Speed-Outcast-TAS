@@ -603,6 +603,7 @@ void InitGame(  const char *mapname, const char *spawntarget, int checkSum, cons
 
 	// set some level globals
 	memset( &level, 0, sizeof( level ) );
+	// Posto
 	level.time = levelTime;
 	level.globalTime = globalTime;
 	Q_strncpyz( level.mapname, mapname, sizeof(level.mapname) );
@@ -1245,6 +1246,7 @@ void G_RunFrame( int levelTime ) {
 	navTime = 0;
 #endif//	AI_TIMERS
 	
+	// Posto
 	level.framenum++;
 	level.previousTime = level.time;
 	level.time = levelTime;

@@ -329,6 +329,129 @@ Handles user intended acceleration
 ==============
 */
 
+static float math_sign(float x)
+{
+	if (x < 0) {
+		return -1;
+	}
+	else {
+		return 1;
+	}
+}
+
+static float math_cross(float v[2], float w[2])
+{
+	return v[0] * w[1] - v[1] * w[0];
+}
+
+static float math_dot(float v[2], float w[2])
+{
+	return v[0] * w[0] + v[1] * w[1];
+}
+
+static float math_norm(float v[3])
+{
+	return sqrtf(v[0] * v[0] + v[1] * v[1]);
+}
+
+static float math_angleBetweenVectors(float v[2], float w[2])
+{
+	float dot = math_dot(v, w) / (math_norm(v) * math_norm(w));
+	return acosf(dot);
+}
+
+static float math_angleSign(float v[2], float w[2])
+{
+	return math_sign(math_cross(v, w));
+}
+
+static float math_pi = 3.14159f;
+
+static float PM_DrinkingPiss(vec3_t wishdir, float wishspeed, float accel, float vel[3], float fwd[3])
+{
+
+	float v_z = vel[2];
+	float w_z = wishdir[2];
+
+	float angle_sign = math_angleSign(vel, fwd);
+
+	float angle_optimal = (wishspeed * (1.0f - accel * pml.frametime) - v_z * w_z) / math_norm(vel);
+	angle_optimal = angle_sign * acosf(angle_optimal);
+	return angle_optimal;
+
+}
+
+#include <Windows.h>
+
+static void PM_Accelerate(vec3_t wishdir, float wishspeed, float accel)
+{
+	int			i;
+	float		addspeed, accelspeed, currentspeed;
+	float		optWishspeed = 179.605133;
+	float		myWish[3]{};
+	float		myWishspeed;
+
+	if (pm->ps->clientNum == 0) {
+		StrafeHelper_SetAccelerationValues(pml.forward, pm->ps->velocity, wishdir,
+			wishspeed, accel, pml.frametime);
+	}
+
+	float velx = pm->ps->velocity[0];
+	float vely = pm->ps->velocity[1];
+	float theta;
+
+	if (pm->ps->clientNum == 0 && (GetKeyState('J') & 0x8000)) {
+		theta = PM_DrinkingPiss(wishdir, optWishspeed, accel, pm->ps->velocity, pml.forward);
+	}
+	else {
+		theta = PM_DrinkingPiss(wishdir, wishspeed, accel, pm->ps->velocity, pml.forward);
+	}
+
+	if (pm->ps->clientNum != 0 || isnan(theta) || !(GetKeyState('J') & 0x8000)) {
+		myWish[0] = wishdir[0];
+		myWish[1] = wishdir[1];
+		myWishspeed = wishspeed;
+	}
+	else {
+		float costh = cosf(theta);
+		float sinth = sinf(theta);
+
+		myWish[0] = costh * velx - sinth * vely;
+		myWish[1] = sinth * velx + costh * vely;
+
+		float myNorm = math_norm(myWish);
+		myWish[0] = myWish[0] / myNorm;
+		myWish[1] = myWish[1] / myNorm;
+
+		myWishspeed = optWishspeed;
+	}
+
+	myWish[2] = wishdir[2];
+	currentspeed = DotProduct(pm->ps->velocity, myWish);
+
+	addspeed = myWishspeed - currentspeed;
+
+	if (addspeed <= 0) {
+		return;
+	}
+	accelspeed = (accel * pml.frametime) * myWishspeed;
+
+	if (accelspeed > addspeed) {
+		accelspeed = addspeed;
+	}
+
+	for (i = 0; i < 3; i++) {
+		pm->ps->velocity[i] += accelspeed * myWish[i];
+	}
+
+	//gi.Printf("%f\n", wishspeed);
+
+}
+
+
+
+
+/*
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) 
 {
 	int			i;
@@ -355,6 +478,7 @@ static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel )
 		pm->ps->velocity[i] += accelspeed * wishdir[i];	
 	}
 }
+*/
 
 /*
 ============

@@ -196,7 +196,7 @@ void TAS::makeOperationThisFrame()
 	}
 	if (allCommandsBuffer[commandsBufferIndex] == "DONE")
 	{
-		//gi.Printf("TAS : end of execution for map %s.\n", lastKnownMap);
+		gi.Printf("TAS : end of execution for map %s.\n", lastKnownMap);
 		//actionBufferIndex = 0;
 		//commandBuffer = "";
 		return;

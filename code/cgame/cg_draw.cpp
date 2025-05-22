@@ -2718,6 +2718,34 @@ static void CG_Draw2D( void )
 		}
 	}
 
+	
+	{
+		#define USE_DISTANCE	64.0f
+		extern qboolean ValidUseTarget(gentity_t* ent);
+		#include "../game/g_local.h"
+		extern level_locals_t level;
+		gentity_t *ent;
+		gentity_t* target;
+		trace_t		trace;
+		vec3_t		src, dest, vf;
+		ent = g_entities + 0;
+
+		VectorCopy(ent->client->renderInfo.eyePoint, src);
+		AngleVectors(ent->client->ps.viewangles, vf, NULL, NULL);
+		VectorMA(src, USE_DISTANCE, vf, dest);
+		gi.trace(&trace, src, vec3_origin, vec3_origin, dest, ent->s.number, MASK_OPAQUE | CONTENTS_SOLID | CONTENTS_BODY | CONTENTS_ITEM | CONTENTS_CORPSE, (EG2_Collision)0, 0);
+		target = &g_entities[trace.entityNum];
+
+		if (ValidUseTarget(target))
+		{
+			gi.Printf(S_COLOR_GREEN"%i AutomaticTargetSeeker : src[%f,%f,%f] , dest[%f,%f,%f]  \n", level.time, src[0], src[1], src[2], dest[0], dest[1], dest[2]);
+			gi.Printf(S_COLOR_GREEN"%i AutomaticTargetSeeker : %s , %s, %s\n", level.time, target->classname, target->target, target->message);
+			gi.Printf(S_COLOR_GREEN"%i AutomaticTargetSeeker : target min&max, dest values must be inside : [%f,%f],[%f,%f],[%f,%f]\n",
+				level.time, target->absmin[0], target->absmax[0], target->absmin[1], target->absmax[1], target->absmin[2], target->absmax[2]);
+		}
+	}
+	
+
 	// don't draw center string if scoreboard is up
 	if ( !CG_DrawScoreboard() ) {
 		CG_DrawCenterString();

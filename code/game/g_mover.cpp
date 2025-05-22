@@ -2545,7 +2545,11 @@ void security_panel_use( gentity_t *self, gentity_t *other, gentity_t *activator
 		//play sound
 		G_Sound( self, self->soundPos2 );
 		//unusable
-		self->e_UseFunc = useF_NULL;
+		 
+
+		// Posto : change the fun to keep the same thing, but set à flag to deactivate the button, so that I can print that it's not enabled anymore
+		//self->e_UseFunc = useF_NULL;
+		self->svFlags |= SVF_INACTIVE;
 	}
 	else
 	{//failure sound/display
